@@ -32,7 +32,7 @@
 #   'prerelease'      -- build a box with a prerelease version of Chef
 
 chef_installer="/tmp/install-chef.sh"
-chef_installer_url="https://www.getchef.com/chef/install.sh"
+chef_installer_url="http://www.getchef.com/chef/install.sh"
 
 # Check whether a command exists - returns 0 if it does, 1 if it does not
 exists() {
@@ -64,7 +64,7 @@ capture_tmp_stderr() {
 # do_wget URL FILENAME
 do_wget() {
   echo "trying wget..."
-  wget -O "$2" "$1" 2>/tmp/stderr
+  wget --no-check-certificate -e use_proxy=yes -e https_proxy=135.245.48.33:8000 -O "$2" "$1" 2>/tmp/stderr
   rc=$?
   # check for 404
   grep "ERROR 404" /tmp/stderr 2>&1 >/dev/null
@@ -184,6 +184,10 @@ do_download() {
 }
 
 if [ x$CHEF_VERSION != x'provisionerless' ]; then
+  export http_proxy=135.245.48.33:8000
+  export https_proxy=135.245.48.33:8000
+  echo "export http_proxy=135.245.48.33:8000" >> ~/.bashrc
+  echo "export https_proxy=135.245.48.33:8000" >> ~/.bashrc
   do_download "$chef_installer_url" "$chef_installer"
   chmod +x $chef_installer
   if [ x$CHEF_VERSION == x'latest' ]; then
@@ -194,6 +198,7 @@ if [ x$CHEF_VERSION != x'provisionerless' ]; then
     $chef_installer -v $CHEF_VERSION
   fi
   rm -f $chef_installer
+  head -n -2 ~/.bashrc > ~/.bashrc
 else
   echo "Building a box without Chef"
 fi

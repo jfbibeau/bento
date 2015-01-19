@@ -1,6 +1,40 @@
 {
   "builders": [
     {
+      "type": "qemu",
+      "qemu_binary": "qemu-kvm",
+      "qemuargs": [
+        ["-machine", "type=pc"]
+      ],
+      "headless": true,
+      "iso_url": "{{user `mirror`}}/rhel-server-6.6-x86_64-dvd.iso",
+      "iso_checksum": "16044cb7264f4bc0150f5b6f3f66936ccf2d36e0a4152c00d9236fb7dcae5f32",
+      "iso_checksum_type": "sha256",
+      "output_directory": "packer-rhel-6.6-x86_64-qemu",
+      "ssh_wait_timeout": "30s",
+      "shutdown_command": "echo 'vagrant'|sudo -S /sbin/halt -h -p",
+      "disk_size": 40960,
+      "format": "qcow2",
+      "accelerator": "kvm",
+      "http_directory": "http",
+      "http_port_min": 10082,
+      "http_port_max": 10089,
+      "ssh_host_port_min": 2222,
+      "ssh_host_port_max": 2229,
+      "ssh_username": "vagrant",
+      "ssh_password": "vagrant",
+      "ssh_port": 22,
+      "ssh_wait_timeout": "10000s",
+      "vm_name": "redhat_6.6",
+      "net_device": "rtl8139",
+      "disk_interface": "virtio",
+      "boot_wait": "10s",
+      "boot_command":
+      [
+        "<tab> text ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/centos-6.6/ks.cfg<enter><wait>"
+      ]
+    },
+    {
       "boot_command": [
         "<tab> text ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/centos-6.6/ks.cfg<enter><wait>"
       ],
@@ -102,7 +136,8 @@
   "post-processors": [
     {
       "output": "../builds/{{.Provider}}/opscode_rhel-6.6_chef-{{user `chef_version`}}.box",
-      "type": "vagrant"
+      "type": "vagrant",
+      "only": ["virtualbox-iso"]
     }
   ],
   "provisioners": [
@@ -124,7 +159,7 @@
     }
   ],
   "variables": {
-    "chef_version": "provisionerless",
+    "chef_version": "11.16.4-1",
     "mirror": "https://content-web.rhn.redhat.com/rhn/isos/rhel-6.6/md5sum/ef031b0ae8458d6489eb277ba1dcb5de"
   }
 }
