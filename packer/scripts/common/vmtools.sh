@@ -35,8 +35,8 @@ parallels-iso|parallels-pvm)
 
 qemu)
     echo "NOZEROCONF=yes" >> /etc/sysconfig/network
-    sed -i '$d' /etc/rc.local
-    cat << EOF >> /etc/rc.local
+    sed -i '$d' /etc/rc.d/rc.local
+    cat << EOF >> /etc/rc.d/rc.local
     if [ ! -d /home/vagrant/.ssh ]; then 
       mkdir -p /home/vagrant/.ssh 
       chmod 700 /home/vagrant/.ssh
